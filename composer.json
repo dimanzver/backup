@@ -1,0 +1,23 @@
+{
+    "name": "diman/backup-yii",
+    "authors": [
+        {
+            "name": "diman",
+            "email": "diman.suvor@yandex.ru"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "~2.0.0",
+        "vlucas/phpdotenv": "^5.1",
+        "ext-zip": "*",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-pdo": "*"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
