@@ -26,9 +26,9 @@ class AuthController extends Controller
         $login = Yii::$app->request->post('login');
         $password = Yii::$app->request->post('password');
         $user = User::findByLogin($login);
-        if(!$user->validatePassword($password)) {
-            Yii::$app->response->setStatusCode(401);
-            return null;
+        if(!$user || !$user->validatePassword($password)) {
+            Yii::$app->response->setStatusCode(422);
+            return ['Неправильный логин или пароль'];
         }
 
         return $user->generateToken();

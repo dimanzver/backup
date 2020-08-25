@@ -1,5 +1,7 @@
 <?php
 
+defined('MIX_MANIFEST_PATH') or define('MIX_MANIFEST_PATH', ROOT_PATH . '/public/assets/mix-manifest.json');
+
 if (!function_exists('env')) {
     /**
      * Gets the value of an environment variable. Supports boolean, empty and null.
@@ -60,4 +62,17 @@ if (!function_exists('value')) {
 function getDirContents($dir) {
     exec('find ' . $dir . ' -type f -print', $result);
     return $result;
+}
+
+
+//function for get assets url
+/**
+ * @param $key
+ * @return mixed
+ */
+function getMixItem($key){
+    $file = file_exists(MIX_MANIFEST_PATH) ? MIX_MANIFEST_PATH : 'http://localhost:8001/dist/mix-manifest.json';
+    $content = file_get_contents($file);
+    $mixItems = json_decode($content, true);
+    return isset($mixItems[$key]) ? $mixItems[$key] : null;
 }

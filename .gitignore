@@ -3,3 +3,4 @@ vendor
 runtime
 storage
 .env
+node_modules

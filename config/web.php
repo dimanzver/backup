@@ -46,8 +46,7 @@ $config = [
             'showScriptName' => false,
             'rules' => [
 //                '<controller>/<action>/<id:\d+>' => '<controller>/<action>',
-//                'api/<controller>/<action>' => '<controller>/<action>',
-//                '' => 'index/index',
+                'api/<controller>/<action>' => '<controller>/<action>',
             ],
         ],
     ],

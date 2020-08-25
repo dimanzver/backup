@@ -1,0 +1,69 @@
+
+/*animation for Vue transitions*/
+/*TODO: fix showing animation*/
+.slide-enter{
+  -webkit-transform: translateX(100vw);
+  -moz-transform: translateX(100vw);
+  -ms-transform: translateX(100vw);
+  -o-transform: translateX(100vw);
+  transform: translateX(100vw);
+}
+
+.slide-enter-to,
+.slide-leave{
+  -webkit-transform: none;
+  -moz-transform: none;
+  -ms-transform: none;
+  -o-transform: none;
+  transform: none;
+}
+
+.slide-leave-to{
+  -webkit-transform: translateX(-100vw);
+  -moz-transform: translateX(-100vw);
+  -ms-transform: translateX(-100vw);
+  -o-transform: translateX(-100vw);
+  transform: translateX(-100vw);
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform .2s, opacity .2s;
+}
+
+.slide-enter, .slide-leave-to{
+  opacity: 0;
+}
+
+
+
+.scale-fade-enter,
+.scale-fade-leave-to{
+  opacity: 0;
+  transform: scale(.2, .2);
+}
+
+.scale-fade-enter-to,
+.scale-fade-leave{
+  opacity: 1;
+  transform: none;
+}
+
+.scale-fade-enter-active, .scale-fade-leave-active {
+  transition: transform .5s, opacity .5s;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.slide-right-enter-active, .slide-right-leave-active{
+  transition: transform .5s, opacity .5s;
+}
+
+.slide-right-enter, .slide-right-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  transform: translateX(calc(100% + 2em));
+  opacity: 0;
+}
