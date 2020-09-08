@@ -2,7 +2,7 @@
     <div class="card">
         <div class="card-header" :class="{'card-header--removable': removable}" @click.stop="toggleOpen">
             <div class="card-title">{{label}}</div>
-            <button class="card-remove btn btn-link text-danger" @click.stop.prevent="$emit('remove')">Удалить</button>
+            <button class="card-remove btn btn-link text-danger" v-if="removable" @click.stop.prevent="$emit('remove')">Удалить</button>
         </div>
 
         <div class="card-body" :class="{'hidden-block': !opened}">

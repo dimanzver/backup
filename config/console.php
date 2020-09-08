@@ -1,7 +1,6 @@
 <?php
 
-use yii\mutex\MysqlMutex;
-use yii\queue\db\Queue;
+
 
 $db = require __DIR__ . '/db.php';
 
@@ -28,13 +27,10 @@ $config = [
         ],
         'db' => $db,
 
-        'queue' => [
-            'class' => Queue::class,
-            'db' => 'db', // DB connection component or its config
-            'tableName' => '{{%queue}}', // Table name
-            'channel' => 'default', // Queue channel key
-            'mutex' => MysqlMutex::class, // Mutex used to sync queries
-            'as log' => \yii\queue\LogBehavior::class,
+        'queue' => require __DIR__ . '/queue.php',
+
+        'redis' => [
+            'class' => \yii\redis\Connection::class,
         ],
 
         'ideHelper' => [

@@ -6,6 +6,7 @@ namespace app\Services;
 
 use app\FileUploaders\FileUploader;
 use app\FileUploaders\NullFileUploader;
+use app\models\Backup;
 use ZipArchive;
 
 class FilesBackupper
@@ -17,7 +18,7 @@ class FilesBackupper
     /**
      * @var int Size of part archive (MB)
      */
-    protected $archiveSize = 50;
+    protected $archiveSize = 25;
 
     /**
      * @var BackupLogger
@@ -28,6 +29,11 @@ class FilesBackupper
      * @var FileUploader
      */
     protected $uploader;
+
+    /**
+     * @var Backup
+     */
+    protected $backup;
 
 
 
@@ -43,11 +49,12 @@ class FilesBackupper
 
 
 
-    public function __construct(array $config, FileUploader $uploader, BackupLogger $logger, string $backupStorageDir)
+    public function __construct(Backup $backup, FileUploader $uploader, BackupLogger $logger, string $backupStorageDir)
     {
-        $this->dir = $config['dir'];
-        if(isset($config['archiveSize']))
-            $this->archiveSize = $config['archiveSize'];
+        $this->backup = $backup;
+        $this->dir = $backup->site->dir;
+        if(!empty($backup->site->part_size))
+            $this->archiveSize = $backup->site->part_size;
         $this->uploader = $uploader;
         $this->logger = $logger;
         $this->backupStorageDir = $backupStorageDir;
@@ -75,6 +82,8 @@ class FilesBackupper
      * Archive size is limited
      */
     protected function backupFilesStep(){
+        $this->backup->updateProgress('Резервное копирование и выгрузка файлов (готово ' . $this->processedFiles . ' из ' . $this->filesCount . ')');
+
         $this->archive = new ZipArchive();
         $filename = $this->backupStorageDir . '/' . date('Y-m-d__H:i:s') . uniqid() . '.zip';
         $this->archive->open($filename, ZipArchive::CREATE);

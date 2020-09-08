@@ -6,10 +6,9 @@ namespace app\jobs;
 
 use app\models\Site;
 use app\services\Backupper;
-use yii\base\BaseObject;
 use yii\queue\JobInterface;
 
-class BackupJob extends BaseObject implements JobInterface
+class BackupJob extends BaseJob implements JobInterface
 {
     public $siteId;
 

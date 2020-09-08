@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <transition name="fade" mode="out-in">
             <div v-if="$store.getters['auth/isAuthenticated']">
-                <router-link class="btn btn-primary m-2" :to="{name: 'main'}">К списку сайтов</router-link>
+                <router-link class="btn btn-primary m-2" :to="{name: 'main'}">Главная</router-link>
                 <router-link class="btn btn-primary m-2" :to="{name: 'settings'}">Настройки</router-link>
                 <div class="cabinet-container">
                     <div class="cabinet-content">
@@ -38,6 +38,10 @@
     created() {
       this.$store.dispatch('sites/updateInfo');
       this.$store.dispatch('settings/load');
+      this.$store.dispatch('backups/updateInfo');
+      setInterval(() => {
+        this.$store.dispatch('backups/updateInfo', true);
+      }, 5000);
     },
 
     methods: {

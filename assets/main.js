@@ -2,6 +2,8 @@
 //   window.$ = jQuery.noConflict();
 // }
 // console.log($)
+import jQuery from 'jquery';
+window.$ = jQuery.noConflict();
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 

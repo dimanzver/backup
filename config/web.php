@@ -1,9 +1,5 @@
 <?php
 
-use yii\mutex\MysqlMutex;
-use yii\queue\db\Queue;
-use yii\queue\LogBehavior;
-
 $db = require __DIR__ . '/db.php';
 
 $config = [
@@ -46,24 +42,25 @@ $config = [
             'enableAutoLogin' => true,
         ],
 
+        'redis' => [
+            'class' => \yii\redis\Connection::class,
+        ],
+
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
+        ],
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-//                '<controller>/<action>/<id:\d+>' => '<controller>/<action>',
+                'api/<controller>/<action>/<id:\d+>' => '<controller>/<action>',
                 'api/<controller>/<action>' => '<controller>/<action>',
                 'api/<controller>' => '<controller>/index',
             ],
         ],
 
-        'queue' => [
-            'class' => Queue::class,
-            'db' => 'db', // DB connection component or its config
-            'tableName' => '{{%queue}}', // Table name
-            'channel' => 'default', // Queue channel key
-            'mutex' => MysqlMutex::class, // Mutex used to sync queries
-            'as log' => LogBehavior::class,
-        ],
+        'queue' => require __DIR__ . '/queue.php',
     ],
 
     'params' => [

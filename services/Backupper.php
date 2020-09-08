@@ -1,12 +1,11 @@
 <?php
 
-
 namespace app\services;
-
 
 use app\DBDumpers\DbDumperContext;
 use app\FileUploaders\FileUploader;
 use app\FileUploaders\FileUploaderContext;
+use app\FileUploaders\NullFileUploader;
 use app\models\Backup;
 use app\models\Settings;
 use app\models\Site;
@@ -41,9 +40,17 @@ class Backupper
         $this->site = $site;
         $this->backup = new Backup([
             'site_id' => $this->site->id,
-            'dir' => $site->title . '/' . date('Y-m-d H_i_s')
+            'dir' => $site->title . '/' . date('Y-m-d H_i_s'),
+            'pid' => getmypid(),
         ]);
         $this->backup->save();
+
+        // После прибития процесса/ошибки - убираем pid и ставим статус ABORTED
+        pcntl_async_signals(true);
+        register_shutdown_function([$this, 'abort']);
+        pcntl_signal(SIGTERM, [$this, 'abort']);
+        pcntl_signal(SIGINT, [$this, 'abort']);
+
         $this->uploader = FileUploaderContext::getUploader(Settings::getValue('uploadMethod'), $this->backup);
 
         $this->logger = new BackupLogger(['prefix' => 'files']);
@@ -55,13 +62,12 @@ class Backupper
 
     public function start()
     {
-        $filesBackupper = new FilesBackupper([
-            'dir' => $this->site->dir,
-            'archiveSize' => $this->site->part_size,
-        ], $this->uploader, $this->logger, $this->backupStorageDir);
+        $this->backup->updateProgress('Начато резервное копирование');
+        $filesBackupper = new FilesBackupper($this->backup, $this->uploader, $this->logger, $this->backupStorageDir);
         $filesBackupper->start();
 
-        $dbDumper = DbDumperContext::getDumper('mysql', $this->backupStorageDir, $this->logger, $this->uploader,
+        $this->backup->updateProgress('Начато резервное копирование базы данных');
+        $dbDumper = DbDumperContext::getDumper('mysql', $this->backupStorageDir, $this->logger,
             [
                 'dbName' => $this->site->db_name,
                 'host' => $this->site->db_host,
@@ -69,6 +75,30 @@ class Backupper
                 'password' => $this->site->db_password,
             ]);
         $dbDumper->dump();
+
+        $this->backup->updateProgress('Выгрузка дампа базы данных');
+        $this->uploader->upload($dbDumper->file);
+        if(!($this->uploader instanceof NullFileUploader))
+            unlink($dbDumper->file);
+        $this->backup->updateProgress('Резервное копирование завершено');
+
+        $this->logger->write('Finished db backup at ' . date('Y-m-d H:i:s'));
+        $this->finish();
     }
 
+    public function finish() {
+        $this->backup->status = Backup::STATUSES['FINISHED'];
+        $this->backup->pid = null;
+        $this->backup->save();
+    }
+
+    public function abort() {
+        if($this->backup->status !== Backup::STATUSES['PROCESSING'] && $this->backup->status !== null)
+            return;
+
+        $this->backup->status = Backup::STATUSES['ABORTED'];
+        $this->backup->pid = null;
+        $this->backup->save();
+        exit;
+    }
 }

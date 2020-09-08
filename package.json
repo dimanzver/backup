@@ -11,9 +11,10 @@
   "dependencies": {
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-regenerator": "^6.26.0",
-    "core-js": "^3.6.2",
-    "loader-utils": "^1.2.3",
     "bootstrap": "^4.5.1",
+    "core-js": "^3.6.2",
+    "jquery": "^3.5.1",
+    "loader-utils": "^1.2.3",
     "vue": "^2.5.11",
     "vue-debug": "0.0.1",
     "vue-router": "^3.0.6",

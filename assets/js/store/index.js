@@ -7,10 +7,11 @@ const debug = process.env.NODE_ENV !== 'production';
 import auth from './modules/auth';
 import sites from './modules/sites';
 import settings from './modules/settings';
+import backups from './modules/backups';
 
 export default new Vuex.Store({
   modules: {
-    auth, sites, settings,
+    auth, sites, settings, backups,
   },
   strict: debug,
 
