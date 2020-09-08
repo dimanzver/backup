@@ -3,7 +3,7 @@ define('YII_START', microtime(true));
 require(__DIR__ . '/../vendor/autoload.php');
 
 setlocale(LC_ALL, 'ru_RU.utf8');
-$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(dirname(__DIR__));
 $dotenv->load();
 require __DIR__ . '/../helpers/helpers.php';
 

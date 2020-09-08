@@ -12,7 +12,7 @@ if (!function_exists('env')) {
      */
     function env($key, $default = null)
     {
-        $value = $_ENV[$key];
+        $value = getenv($key);
 
         if ($value === false) {
             return value($default);
@@ -75,4 +75,9 @@ function getMixItem($key){
     $content = file_get_contents($file);
     $mixItems = json_decode($content, true);
     return isset($mixItems[$key]) ? $mixItems[$key] : null;
+}
+
+
+function base_path($path) {
+    return ROOT_PATH . '/' . $path;
 }

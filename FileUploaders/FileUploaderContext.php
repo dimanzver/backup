@@ -4,19 +4,22 @@
 namespace app\FileUploaders;
 
 
+use app\models\Backup;
+
 class FileUploaderContext
 {
 
     /**
      * @param  string  $name
-     * @return FileUploaderInterface
+     * @return FileUploader
      */
-    public static function getUploader(string $name){
+    public static function getUploader(string $name, Backup $backup){
         switch ($name){
-
+            case 'google-drive':
+                return new GoogleDriveUploader($backup);
 
             default:
-                return new NullFileUploader();
+                return new NullFileUploader($backup);
         }
     }
 

@@ -5,19 +5,30 @@ namespace app\services;
 
 
 use app\DBDumpers\DbDumperContext;
+use app\FileUploaders\FileUploader;
 use app\FileUploaders\FileUploaderContext;
-use app\FileUploaders\FileUploaderInterface;
+use app\models\Backup;
+use app\models\Settings;
+use app\models\Site;
 
 class Backupper
 {
     /**
-     * @var FileUploaderInterface
+     * @var FileUploader
      */
     protected $uploader;
 
     const ARCHIVES_DIR = ROOT_PATH.'/storage/archives';
 
-    protected $config;
+    /**
+     * @var Site
+     */
+    protected $site;
+
+    /**
+     * @var Backup
+     */
+    protected $backup;
 
 
     /**
@@ -25,13 +36,18 @@ class Backupper
      */
     protected $logger;
 
-    public function __construct(array $config)
+    public function __construct(Site $site)
     {
-        $this->config = $config;
-        $this->uploader = FileUploaderContext::getUploader($config['uploader']);
+        $this->site = $site;
+        $this->backup = new Backup([
+            'site_id' => $this->site->id,
+            'dir' => $site->title . '/' . date('Y-m-d H_i_s')
+        ]);
+        $this->backup->save();
+        $this->uploader = FileUploaderContext::getUploader(Settings::getValue('uploadMethod'), $this->backup);
 
         $this->logger = new BackupLogger(['prefix' => 'files']);
-        $this->backupStorageDir = self::ARCHIVES_DIR.'/'.date('Y-m-d H_i_s');
+        $this->backupStorageDir = self::ARCHIVES_DIR . '/' . $this->backup->dir;
         if (!is_dir($this->backupStorageDir)) {
             mkdir($this->backupStorageDir, 0777, true);
         }
@@ -39,15 +55,18 @@ class Backupper
 
     public function start()
     {
-        $filesBackupper = new FilesBackupper($this->config, $this->uploader, $this->logger, $this->backupStorageDir);
+        $filesBackupper = new FilesBackupper([
+            'dir' => $this->site->dir,
+            'archiveSize' => $this->site->part_size,
+        ], $this->uploader, $this->logger, $this->backupStorageDir);
         $filesBackupper->start();
 
         $dbDumper = DbDumperContext::getDumper('mysql', $this->backupStorageDir, $this->logger, $this->uploader,
             [
-                'dbName' => env('DB_NAME'),
-                'host' => env('DB_HOST'),
-                'user' => env('DB_USER'),
-                'password' => env('DB_PASSWORD'),
+                'dbName' => $this->site->db_name,
+                'host' => $this->site->db_host,
+                'user' => $this->site->db_user,
+                'password' => $this->site->db_password,
             ]);
         $dbDumper->dump();
     }

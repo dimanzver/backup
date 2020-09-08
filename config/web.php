@@ -1,9 +1,14 @@
 <?php
 
+use yii\mutex\MysqlMutex;
+use yii\queue\db\Queue;
+use yii\queue\LogBehavior;
+
 $db = require __DIR__ . '/db.php';
+
 $config = [
     'id' => 'backup-app',
-    'bootstrap' => ['log',],
+    'bootstrap' => ['log', 'queue',],
     'timeZone' => 'Europe/Moscow',
     // the basePath of the application will be the `micro-app` directory
     'basePath' => dirname(__DIR__),
@@ -47,8 +52,22 @@ $config = [
             'rules' => [
 //                '<controller>/<action>/<id:\d+>' => '<controller>/<action>',
                 'api/<controller>/<action>' => '<controller>/<action>',
+                'api/<controller>' => '<controller>/index',
             ],
         ],
+
+        'queue' => [
+            'class' => Queue::class,
+            'db' => 'db', // DB connection component or its config
+            'tableName' => '{{%queue}}', // Table name
+            'channel' => 'default', // Queue channel key
+            'mutex' => MysqlMutex::class, // Mutex used to sync queries
+            'as log' => LogBehavior::class,
+        ],
+    ],
+
+    'params' => [
+
     ],
 ];
 

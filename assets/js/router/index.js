@@ -4,6 +4,8 @@ import Vue from 'vue';
 Vue.use(Router);
 
 const Main = () => import('../components/pages/Main');
+const SiteMain = () => import('../components/pages/SiteMain');
+const Settings = () => import('../components/pages/Settings');
 
 const router = new Router({
   // mode: 'history',
@@ -15,6 +17,25 @@ const router = new Router({
 
       meta: {
         title: 'Главная',
+      },
+    },
+    {
+      path: '/sites/:id',
+      name: 'site.main',
+      component: SiteMain,
+
+      meta: {
+        title: 'Карточка сайта',
+      },
+      props: true,
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: Settings,
+
+      meta: {
+        title: 'Настройки',
       },
     },
   ],

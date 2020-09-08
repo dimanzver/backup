@@ -4,7 +4,7 @@
 namespace app\FileUploaders;
 
 
-class NullFileUploader implements FileUploaderInterface
+class NullFileUploader extends FileUploader
 {
 
     public function upload($file)

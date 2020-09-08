@@ -4,3 +4,8 @@ runtime
 storage
 .env
 node_modules
+.google-credentials
+.google-service-key
+.google-token
+_ide_helper.php
+public/assets

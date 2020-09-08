@@ -4,7 +4,8 @@
 namespace app\Services;
 
 
-use app\FileUploaders\FileUploaderInterface;
+use app\FileUploaders\FileUploader;
+use app\FileUploaders\NullFileUploader;
 use ZipArchive;
 
 class FilesBackupper
@@ -24,7 +25,7 @@ class FilesBackupper
     protected $logger;
 
     /**
-     * @var FileUploaderInterface
+     * @var FileUploader
      */
     protected $uploader;
 
@@ -42,7 +43,7 @@ class FilesBackupper
 
 
 
-    public function __construct(array $config, FileUploaderInterface $uploader, BackupLogger $logger, string $backupStorageDir)
+    public function __construct(array $config, FileUploader $uploader, BackupLogger $logger, string $backupStorageDir)
     {
         $this->dir = $config['dir'];
         if(isset($config['archiveSize']))
@@ -96,6 +97,8 @@ class FilesBackupper
         $this->logger->write('Created archive part ' . $filename);
         $this->archive->close();
         $this->uploader->upload($filename);
+        if(!($this->uploader instanceof NullFileUploader))
+            unlink($filename);
     }
 
     /**

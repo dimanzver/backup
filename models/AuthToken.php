@@ -4,8 +4,6 @@
 namespace app\models;
 
 
-use yii\db\ActiveRecord;
-
 /**
  * Class AuthToken
  * @package app\models
@@ -17,7 +15,7 @@ use yii\db\ActiveRecord;
  * @property User $user
  */
 
-class AuthToken extends ActiveRecord
+class AuthToken extends BaseModel
 {
 
     public static function tableName()

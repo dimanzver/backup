@@ -12,12 +12,19 @@
         "ext-zip": "*",
         "ext-json": "*",
         "ext-openssl": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "google/apiclient": "^2.7",
+        "luoxiaojun1992/yii2-tinker": "^1.0",
+      "ext-fileinfo": "*",
+        "yiisoft/yii2-queue": "^2.3"
     },
     "repositories": [
         {
             "type": "composer",
             "url": "https://asset-packagist.org"
         }
-    ]
+    ],
+    "require-dev": {
+        "mis/yii2-ide-helper": "^1.0"
+    }
 }

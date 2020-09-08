@@ -1,10 +1,14 @@
 <?php
 
+use yii\mutex\MysqlMutex;
+use yii\queue\db\Queue;
+
 $db = require __DIR__ . '/db.php';
+
 $config = [
     'id' => 'backup-app',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log',],
+    'bootstrap' => ['log', 'queue', 'ideHelper',],
     'controllerNamespace' => 'app\commands',
     'timeZone' => 'Europe/Moscow',
     'aliases' => [
@@ -23,6 +27,19 @@ $config = [
             ],
         ],
         'db' => $db,
+
+        'queue' => [
+            'class' => Queue::class,
+            'db' => 'db', // DB connection component or its config
+            'tableName' => '{{%queue}}', // Table name
+            'channel' => 'default', // Queue channel key
+            'mutex' => MysqlMutex::class, // Mutex used to sync queries
+            'as log' => \yii\queue\LogBehavior::class,
+        ],
+
+        'ideHelper' => [
+            'class' => 'Mis\IdeHelper\IdeHelper',
+        ],
     ],
 
     'controllerMap' => [
@@ -30,8 +47,22 @@ $config = [
 //            'class' => 'yii\faker\FixtureController',
 //        ],
 
+        'tinker' => [ // Tinker command line.
+            'class' => \Yii2Tinker\TinkerController::class,
+        ],
+
+        'migrate' => [
+            'class' => 'yii\console\controllers\MigrateController',
+            'migrationNamespaces' => [
+                'yii\queue\db\migrations',
+            ],
+        ],
+
     ],
 
+    'params' => [
+
+    ],
 ];
 
 return $config;

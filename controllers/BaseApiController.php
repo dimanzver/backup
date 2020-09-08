@@ -4,7 +4,8 @@
 namespace app\controllers;
 
 
-use yii\filters\auth\HttpBasicAuth;
+use Yii;
+use yii\filters\auth\HttpBearerAuth;
 use yii\rest\Controller;
 
 class BaseApiController extends Controller
@@ -13,12 +14,14 @@ class BaseApiController extends Controller
     public function init()
     {
         parent::init();
-        \Yii::$app->user->enableSession = false;
+        Yii::$app->user->enableSession = false;
     }
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['class'] = HttpBasicAuth::class;
+        $behaviors['authenticator'] = [
+            'class' => HttpBearerAuth::class,
+        ];
         return $behaviors;
     }
 

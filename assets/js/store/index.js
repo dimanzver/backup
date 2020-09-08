@@ -5,10 +5,12 @@ Vue.use(Vuex);
 const debug = process.env.NODE_ENV !== 'production';
 
 import auth from './modules/auth';
+import sites from './modules/sites';
+import settings from './modules/settings';
 
 export default new Vuex.Store({
   modules: {
-    auth,
+    auth, sites, settings,
   },
   strict: debug,
 

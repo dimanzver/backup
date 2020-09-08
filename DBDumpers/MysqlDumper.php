@@ -4,7 +4,8 @@
 namespace app\DBDumpers;
 
 
-use app\FileUploaders\FileUploaderInterface;
+use app\FileUploaders\FileUploader;
+use app\FileUploaders\NullFileUploader;
 use app\services\BackupLogger;
 use Exception;
 
@@ -22,7 +23,7 @@ class MysqlDumper implements DbDumperInterface
     protected $logger;
 
     /**
-     * @var FileUploaderInterface
+     * @var FileUploader
      */
     protected $uploader;
 
@@ -50,6 +51,8 @@ class MysqlDumper implements DbDumperInterface
             throw new Exception('Не удалось сделать бэкап базы данных');
         }
         $this->uploader->upload($file);
+        if(!($this->uploader instanceof NullFileUploader))
+            unlink($file);
 
         $this->logger->write('Finished db backup at ' . date('Y-m-d H:i:s'));
     }
