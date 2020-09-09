@@ -26,4 +26,14 @@ class BackupsController extends BaseApiController
     public function actionStop($id) {
         Yii::$app->queue->push(new StopBackupJob(compact('id')));
     }
+
+    public function actionRestore($id) {
+        $backup = Backup::findOne($id);
+        if($backup->status !== Backup::STATUSES['FINISHED']) {
+            Yii::$app->response->setStatusCode(422);
+            return ['Бэкап еще не завершен, из него нельзя восстановить сайт'];
+        }
+
+
+    }
 }

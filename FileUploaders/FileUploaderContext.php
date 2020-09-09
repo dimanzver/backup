@@ -3,7 +3,7 @@
 
 namespace app\FileUploaders;
 
-
+use app\Exceptions\InvalidConfigurationException;
 use app\models\Backup;
 
 class FileUploaderContext
@@ -19,7 +19,7 @@ class FileUploaderContext
                 return new GoogleDriveUploader($backup);
 
             default:
-                return new NullFileUploader($backup);
+                throw new InvalidConfigurationException('Неверный метод загрузки файла');
         }
     }
 

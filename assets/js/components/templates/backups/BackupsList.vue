@@ -19,10 +19,14 @@
                         <td>{{backup.statusText}}</td>
                         <td>{{backup.progress_text}}</td>
                         <td>
-                            <button v-if="!backup.status"
+                            <button v-if="backup.status === statuses.PROCESSING"
                                     class="btn btn-primary"
                                     @click="stop(backup)"
                             >Прервать</button>
+                            <button v-if="backup.status === statuses.FINISHED"
+                                    class="btn btn-primary"
+                                    @click="restore(backup)"
+                            >Восстановить</button>
                         </td>
                     </tr>
                 </tbody>
@@ -32,6 +36,7 @@
 </template>
 
 <script>
+  import {mapState} from 'vuex';
   export default {
     name: 'BackupsList',
 
@@ -42,13 +47,30 @@
       },
     },
 
+    computed: {
+      ...mapState('backups', ['statuses']),
+    },
 
     methods: {
+      // TODO: to vuex or something else
       stop(backup) {
         if(!confirm(`Прервать бэкап сайта ${backup.site.title}?`))
           return;
         apiRequest.post('/api/backups/stop/' + backup.id).then(() => {
           this.$store.dispatch('addSuccess', 'Запрос на остановку бэкапа принят');
+        });
+      },
+
+      restore(backup) {
+        if(!confirm(`Восстановить сайт ${backup.site.title} из бэкапа? Это перезапишет текущие файлы, этот процесс будет невозможно прервать`))
+          return;
+
+        apiRequest.post('/api/backups/restore/' + backup.id).then(() => {
+          this.$store.dispatch('addSuccess','Восстановление сайта из бэкапа отправлено в очередь задач');
+        }).catch(response => {
+          ErrorProcessing.getErrorMessage(response).then(errorMessage => {
+            this.$store.dispatch('addDanger',errorMessage);
+          });
         });
       },
     },

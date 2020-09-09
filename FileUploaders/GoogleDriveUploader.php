@@ -5,6 +5,7 @@ namespace app\FileUploaders;
 
 //use Google_Auth_Exception;
 use app\models\Settings;
+use app\services\TmpFile;
 use Google_Exception;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
@@ -205,5 +206,46 @@ class GoogleDriveUploader extends FileUploader
             'data' => file_get_contents($localPath),
             'uploadType' => 'multipart',
         ]);
+    }
+
+    /**
+     * Get file on path in remote
+     *
+     * @param string $remotePath
+     * @return Google_Service_Drive_DriveFile|null
+     */
+    public static function findFile($remotePath) {
+        $pathInfo = pathinfo($remotePath);
+        $googleDir = self::getDirectoryInPath($pathInfo['dirname']);
+        $find = self::getDrive()->files->listFiles([
+            'fields' => 'files(id, name, parents)',
+            'q' => 'trashed = false and \'' . $googleDir->id . '\' in parents and mimeType != \'application/vnd.google-apps.folder\' and name = \'' . $pathInfo['basename'] . '\'',
+        ]);
+
+        if($find->count())
+            return $find[0];
+        return null;
+    }
+
+    /**
+     * Save file to tmp file
+     *
+     * @param  Google_Service_Drive_DriveFile  $file
+     * @return TmpFile
+     */
+    public static function downloadFile(Google_Service_Drive_DriveFile $file) {
+        $content = self::getDrive()->files->get($file->getId(), ["alt" => "media"]);
+        $tmpFile = new TmpFile('backup_google' . $file->getId() . uniqid());
+        file_put_contents($tmpFile, $content->getBody()->getContents());
+        return $tmpFile;
+    }
+
+    public function download($remotePath): ?TmpFile
+    {
+        $file = self::findFile($remotePath);
+        if(!$file)
+            return null;
+
+        return self::download($file);
     }
 }

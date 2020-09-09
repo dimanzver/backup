@@ -4,6 +4,8 @@
 namespace app\models;
 
 
+use app\services\Backupper;
+
 /**
  * Class Backup
  * @package app\models
@@ -63,4 +65,9 @@ class Backup extends BaseModel
         $this->progress_text = $progressText;
         $this->save();
     }
+
+    public function getDir() {
+        return Backupper::ARCHIVES_DIR . '/' . $this->dir;
+    }
+
 }

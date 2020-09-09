@@ -5,7 +5,6 @@ namespace app\services;
 use app\DBDumpers\DbDumperContext;
 use app\FileUploaders\FileUploader;
 use app\FileUploaders\FileUploaderContext;
-use app\FileUploaders\NullFileUploader;
 use app\models\Backup;
 use app\models\Settings;
 use app\models\Site;
@@ -53,7 +52,7 @@ class Backupper
 
         $this->uploader = FileUploaderContext::getUploader(Settings::getValue('uploadMethod'), $this->backup);
 
-        $this->logger = new BackupLogger(['prefix' => 'files']);
+        $this->logger = new BackupLogger(['prefix' => 'backup']);
         $this->backupStorageDir = self::ARCHIVES_DIR . '/' . $this->backup->dir;
         if (!is_dir($this->backupStorageDir)) {
             mkdir($this->backupStorageDir, 0777, true);
@@ -63,11 +62,11 @@ class Backupper
     public function start()
     {
         $this->backup->updateProgress('Начато резервное копирование');
-        $filesBackupper = new FilesBackupper($this->backup, $this->uploader, $this->logger, $this->backupStorageDir);
+        $filesBackupper = new FilesBackupper($this->backup, $this->uploader, $this->logger);
         $filesBackupper->start();
 
         $this->backup->updateProgress('Начато резервное копирование базы данных');
-        $dbDumper = DbDumperContext::getDumper('mysql', $this->backupStorageDir, $this->logger,
+        $dbDumper = DbDumperContext::getDumper($this->site->db_driver, $this->backupStorageDir, $this->logger,
             [
                 'dbName' => $this->site->db_name,
                 'host' => $this->site->db_host,
@@ -78,8 +77,7 @@ class Backupper
 
         $this->backup->updateProgress('Выгрузка дампа базы данных');
         $this->uploader->upload($dbDumper->file);
-        if(!($this->uploader instanceof NullFileUploader))
-            unlink($dbDumper->file);
+        unlink($dbDumper->file);
         $this->backup->updateProgress('Резервное копирование завершено');
 
         $this->logger->write('Finished db backup at ' . date('Y-m-d H:i:s'));

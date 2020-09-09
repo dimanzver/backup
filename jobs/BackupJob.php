@@ -18,6 +18,7 @@ class BackupJob extends BaseJob implements JobInterface
      */
     public function execute($queue)
     {
+        proc_nice(10);
         $site = Site::findOne($this->siteId);
         $backupper = new Backupper($site);
         $backupper->start();
